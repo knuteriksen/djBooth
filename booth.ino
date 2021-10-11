@@ -1,12 +1,12 @@
-#define RELAY_PIN 15        //D12
-#define BUTTON_PIN 5        //D2
+#define RELAY_PIN 12        //D12
+#define BUTTON_PIN 2        //D2
 
-#define TIMEOUT   900000    //15*60*1000 = 15 min -> milliSeconds 
+#define TIMEOUT   900000    //15*60*1000 = 15 min -> milliSeconds
+// #define TIMEOUT 60000
 
 unsigned long time_start = 0;
 bool timer_active = false;
-
-volatile bool button_pushed = false;
+volatile int button_pushed = 0;
 
 void lights_off() {
   digitalWrite(RELAY_PIN, LOW);
@@ -17,7 +17,7 @@ void lights_on() {
 }
 
 bool is_timeout() {
-  return (timer_active && (millis() > time_start + TIMEOUT))
+  return (timer_active && (millis() > time_start + TIMEOUT));
 }
 
 void start_timer() {
@@ -30,11 +30,11 @@ void stop_timer() {
 }
 
 void on_interrupt() {
-  button_pushed = true;
+  button_pushed = 1;
 }
 
 void setup() {
-  // put your setup code here, to run once:
+  // put your setup code here, to run once:  
   pinMode(RELAY_PIN, OUTPUT);
   lights_off();
 
@@ -43,13 +43,12 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  // put your main code here, to run repeatedly:  
   if (button_pushed) {
     start_timer();
     lights_on();
-    button_pushed = false;
+    button_pushed = 0;
   }
-
   if (is_timeout()) {
     stop_timer();
     lights_off();
